@@ -1,0 +1,7 @@
+/* Component-local styles for yayhop landing */
+
+.App {
+    min-height: 100vh;
+    background-color: var(--yh-bg);
+    color: var(--yh-text);
+}

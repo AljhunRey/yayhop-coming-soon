@@ -1,0 +1,287 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Satoshi font family from Fontshare */
+@import url('https://api.fontshare.com/v2/css?f[]=satoshi@300,400,500,700,900&display=swap');
+
+@layer base {
+    :root {
+        /* yayhop Light theme — warm beige brand palette */
+        --yh-bg: #f3efe8;
+        --yh-card: #ffffff;
+        --yh-card-secondary: #e8e4dc;
+        --yh-text: #03314b;
+        --yh-text-secondary: #5a6f7f;
+        --yh-primary: #03314b;
+        --yh-accent: #ff760e;
+        --yh-accent-dark: #ff5d00;
+        --yh-button-bg: #fff4e8;
+        --yh-border: #d4d0c8;
+        --yh-navy: #03314b;
+        --yh-cream: #f3efe8;
+
+        /* shadcn tokens mapped to brand (kept for component compatibility) */
+        --background: 36 25% 93%;
+        --foreground: 202 89% 15%;
+        --card: 0 0% 100%;
+        --card-foreground: 202 89% 15%;
+        --popover: 0 0% 100%;
+        --popover-foreground: 202 89% 15%;
+        --primary: 202 89% 15%;
+        --primary-foreground: 36 25% 93%;
+        --secondary: 36 18% 89%;
+        --secondary-foreground: 202 89% 15%;
+        --muted: 36 18% 89%;
+        --muted-foreground: 205 16% 43%;
+        --accent: 24 100% 53%;
+        --accent-foreground: 0 0% 100%;
+        --destructive: 0 84% 60%;
+        --destructive-foreground: 0 0% 100%;
+        --border: 36 18% 82%;
+        --input: 36 18% 82%;
+        --ring: 24 100% 53%;
+        --radius: 0.75rem;
+    }
+
+    /* Auto dark mode via system preference */
+    @media (prefers-color-scheme: dark) {
+        :root {
+            --yh-bg: #03314b;
+            --yh-card: #003553;
+            --yh-card-secondary: #093d5e;
+            --yh-text: #f3efe8;
+            --yh-text-secondary: #8ec3d8;
+            --yh-primary: #80b3c8;
+            --yh-accent: #ff760e;
+            --yh-accent-dark: #ff5d00;
+            --yh-button-bg: #0c4164;
+            --yh-border: #245f80;
+            --yh-navy: #03314b;
+            --yh-cream: #f3efe8;
+
+            --background: 202 89% 15%;
+            --foreground: 36 25% 93%;
+            --card: 202 80% 17%;
+            --card-foreground: 36 25% 93%;
+            --popover: 202 80% 17%;
+            --popover-foreground: 36 25% 93%;
+            --primary: 197 40% 65%;
+            --primary-foreground: 202 89% 15%;
+            --secondary: 202 70% 22%;
+            --secondary-foreground: 36 25% 93%;
+            --muted: 202 70% 22%;
+            --muted-foreground: 197 40% 70%;
+            --accent: 24 100% 53%;
+            --accent-foreground: 36 25% 93%;
+            --destructive: 0 84% 60%;
+            --destructive-foreground: 36 25% 93%;
+            --border: 202 55% 32%;
+            --input: 202 55% 32%;
+            --ring: 24 100% 53%;
+        }
+    }
+}
+
+@layer base {
+    * {
+        border-color: hsl(var(--border));
+    }
+
+    html,
+    body,
+    #root {
+        min-height: 100%;
+    }
+
+    body {
+        margin: 0;
+        font-family: 'Satoshi', ui-sans-serif, system-ui, -apple-system, sans-serif;
+        background-color: var(--yh-bg);
+        color: var(--yh-text);
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        font-feature-settings: "ss01", "ss02";
+    }
+
+    ::selection {
+        background: var(--yh-accent);
+        color: #ffffff;
+    }
+}
+
+/* ---------- Custom utilities ---------- */
+.yh-bg { background-color: var(--yh-bg); }
+.yh-card { background-color: var(--yh-card); }
+.yh-card-2 { background-color: var(--yh-card-secondary); }
+.yh-text { color: var(--yh-text); }
+.yh-text-2 { color: var(--yh-text-secondary); }
+.yh-accent { color: var(--yh-accent); }
+.yh-bg-accent { background-color: var(--yh-accent); }
+.yh-border { border-color: var(--yh-border); }
+
+.font-satoshi { font-family: 'Satoshi', sans-serif; }
+
+/* Hero grain texture */
+.grain-overlay {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.35;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml;utf8,<svg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.55 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+}
+
+/* Orange glow */
+.glow-accent {
+    box-shadow:
+        0 0 0 1px rgba(255, 118, 14, 0.25),
+        0 12px 40px -12px rgba(255, 118, 14, 0.55),
+        0 30px 90px -30px rgba(255, 118, 14, 0.35);
+}
+
+/* Soft dotted grid */
+.dotted-grid {
+    background-image: radial-gradient(
+        circle at 1px 1px,
+        color-mix(in srgb, var(--yh-text) 18%, transparent) 1px,
+        transparent 0
+    );
+    background-size: 28px 28px;
+}
+
+/* ---------- Animations ---------- */
+@keyframes hop {
+    0%, 100% { transform: translateY(0) rotate(-6deg); }
+    35% { transform: translateY(-22px) rotate(4deg); }
+    65% { transform: translateY(-6px) rotate(-2deg); }
+}
+
+@keyframes floaty {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+@keyframes pulseRing {
+    0% { transform: scale(0.92); opacity: 0.8; }
+    100% { transform: scale(1.6); opacity: 0; }
+}
+
+@keyframes fadeUp {
+    0% { opacity: 0; transform: translateY(18px); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes marquee {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+}
+
+@keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
+
+.animate-hop { animation: hop 1.8s ease-in-out infinite; transform-origin: 50% 100%; }
+.animate-floaty { animation: floaty 5s ease-in-out infinite; }
+.animate-fade-up { animation: fadeUp 0.8s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.pulse-ring {
+    position: absolute;
+    inset: 0;
+    border-radius: 9999px;
+    border: 2px solid var(--yh-accent);
+    animation: pulseRing 2.4s ease-out infinite;
+}
+
+/* delay helpers */
+.delay-100 { animation-delay: 0.1s; }
+.delay-200 { animation-delay: 0.2s; }
+.delay-300 { animation-delay: 0.3s; }
+.delay-400 { animation-delay: 0.4s; }
+.delay-500 { animation-delay: 0.5s; }
+.delay-600 { animation-delay: 0.6s; }
+.delay-700 { animation-delay: 0.7s; }
+
+/* Marquee track */
+.marquee-track {
+    display: flex;
+    width: max-content;
+    animation: marquee 35s linear infinite;
+}
+
+/* Shimmering "coming soon" text */
+.text-shimmer {
+    background: linear-gradient(
+        90deg,
+        var(--yh-text-secondary) 0%,
+        var(--yh-accent) 50%,
+        var(--yh-text-secondary) 100%
+    );
+    background-size: 200% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: shimmer 4s linear infinite;
+}
+
+/* Logo switching — show the right one per color scheme */
+.logo-dark { display: none; }
+.logo-light { display: block; }
+@media (prefers-color-scheme: dark) {
+    .logo-dark { display: block; }
+    .logo-light { display: none; }
+}
+
+/* Input focus ring */
+.yh-input {
+    background: var(--yh-card);
+    color: var(--yh-text);
+    border: 1px solid var(--yh-border);
+    transition: border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
+}
+.yh-input::placeholder { color: var(--yh-text-secondary); opacity: 0.7; }
+.yh-input:focus {
+    outline: none;
+    border-color: var(--yh-accent);
+    box-shadow: 0 0 0 4px rgba(255, 118, 14, 0.18);
+}
+
+/* Primary button */
+.yh-btn {
+    background: linear-gradient(135deg, var(--yh-accent) 0%, var(--yh-accent-dark) 100%);
+    color: #ffffff;
+    transition: transform 180ms ease, box-shadow 180ms ease, filter 180ms ease;
+    box-shadow: 0 10px 30px -10px rgba(255, 118, 14, 0.6);
+}
+.yh-btn:hover:not(:disabled) {
+    transform: translateY(-1px);
+    filter: brightness(1.05);
+    box-shadow: 0 14px 40px -10px rgba(255, 118, 14, 0.75);
+}
+.yh-btn:active:not(:disabled) { transform: translateY(0); }
+.yh-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+/* Pill tag */
+.yh-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px;
+    border-radius: 9999px;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    background: color-mix(in srgb, var(--yh-accent) 12%, transparent);
+    color: var(--yh-accent);
+    border: 1px solid color-mix(in srgb, var(--yh-accent) 35%, transparent);
+}
+
+.yh-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 9999px;
+    background: var(--yh-accent);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--yh-accent) 25%, transparent);
+    animation: floaty 2.4s ease-in-out infinite;
+}
