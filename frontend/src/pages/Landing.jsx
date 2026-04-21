@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "sonner";
-import { ArrowRight, Mail, MapPin, Sparkles, Car, Package, Users, Check, Cog, Wrench } from "lucide-react";
+import { ArrowRight, Mail, MapPin, Sparkles, Car, Package, Users, Check, Cog } from "lucide-react";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
-const LOGO_DARK = "https://customer-assets.emergentagent.com/job_d06f4357-d611-4fca-9e5e-ffbd70d85b75/artifacts/m6hvgmhg_logo-full-dark.png";
-const LOGO_LIGHT = "https://customer-assets.emergentagent.com/job_d06f4357-d611-4fca-9e5e-ffbd70d85b75/artifacts/jfzoowq7_logo-full-light.png";
+const LOGO_DARK = "https://customer-assets.emergentagent.com/job_yayhop-coming-soon/artifacts/r6gf9rwx_yayhop-text-logo-dark.png";
+const LOGO_LIGHT = "https://customer-assets.emergentagent.com/job_d06f4357-d611-4fca-9e5e-ffbd70d85b75/artifacts/hhxmbv4i_yayhop-text-logo-light.png";
 const BUNNY = "https://customer-assets.emergentagent.com/job_d06f4357-d611-4fca-9e5e-ffbd70d85b75/artifacts/gizaii8c_SocMed-PP-transparent.png";
 
 const CONTACT_EMAIL = "official@yayhop.com";
@@ -115,21 +115,20 @@ export default function Landing() {
           <img
             src={LOGO_DARK}
             alt="yayhop"
-            className="logo-dark h-9 w-auto sm:h-11"
+            className="logo-dark h-7 w-auto sm:h-9"
             data-testid="logo-dark"
           />
           <img
             src={LOGO_LIGHT}
             alt="yayhop"
-            className="logo-light h-9 w-auto sm:h-11"
+            className="logo-light h-7 w-auto sm:h-9"
             data-testid="logo-light"
           />
         </a>
         <a
           href={`mailto:${CONTACT_EMAIL}`}
-          className="hidden items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition hover:scale-[1.02] sm:inline-flex"
+          className="hidden items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition hover:scale-[1.02] sm:inline-flex"
           style={{
-            borderColor: "var(--yh-border)",
             color: "var(--yh-text)",
             backgroundColor: "var(--yh-card)",
           }}
@@ -153,7 +152,6 @@ export default function Landing() {
           >
             <span className="yh-gears" aria-hidden>
               <Cog className="yh-gear-lg" />
-              <Wrench className="yh-gear-sm" />
             </span>
             Under Development
           </span>
@@ -291,10 +289,9 @@ export default function Landing() {
 
             {/* Floating chips */}
             <div
-              className="animate-floaty absolute -left-2 top-8 rounded-2xl border px-3 py-2 text-xs font-semibold shadow-lg sm:-left-6"
+              className="animate-floaty absolute -left-2 top-8 rounded-2xl px-3 py-2 text-xs font-semibold shadow-lg sm:-left-6"
               style={{
                 background: "var(--yh-card)",
-                borderColor: "var(--yh-border)",
                 color: "var(--yh-text)",
               }}
               data-testid="chip-rides"
@@ -303,10 +300,9 @@ export default function Landing() {
               Rides scheduled, friends found
             </div>
             <div
-              className="animate-floaty absolute -right-2 bottom-10 rounded-2xl border px-3 py-2 text-xs font-semibold shadow-lg sm:-right-6"
+              className="animate-floaty absolute -right-2 bottom-10 rounded-2xl px-3 py-2 text-xs font-semibold shadow-lg sm:-right-6"
               style={{
                 background: "var(--yh-card)",
-                borderColor: "var(--yh-border)",
                 color: "var(--yh-text)",
                 animationDelay: "1.5s",
               }}
@@ -345,10 +341,9 @@ export default function Landing() {
             return (
               <div
                 key={f.title}
-                className="group relative overflow-hidden rounded-3xl border p-6 transition hover:-translate-y-1"
+                className="group relative overflow-hidden rounded-3xl p-6 transition hover:-translate-y-1"
                 style={{
                   background: "var(--yh-card)",
-                  borderColor: "var(--yh-border)",
                   animation: `fadeUp 0.8s cubic-bezier(0.22, 1, 0.36, 1) ${0.1 * (i + 1)}s both`,
                 }}
                 data-testid={`feature-card-${i}`}
@@ -400,11 +395,10 @@ export default function Landing() {
         data-testid="contact-section"
       >
         <div
-          className="relative overflow-hidden rounded-3xl border px-6 py-10 sm:px-10 sm:py-12"
+          className="relative overflow-hidden rounded-3xl px-6 py-10 sm:px-10 sm:py-12"
           style={{
             background:
               "linear-gradient(135deg, color-mix(in srgb, var(--yh-accent) 10%, var(--yh-card)) 0%, var(--yh-card) 60%)",
-            borderColor: "var(--yh-border)",
           }}
         >
           <div className="grain-overlay" aria-hidden />
@@ -444,8 +438,8 @@ export default function Landing() {
         data-testid="site-footer"
       >
         <div
-          className="flex flex-col items-start justify-between gap-4 border-t pt-6 text-xs sm:flex-row sm:items-center"
-          style={{ borderColor: "var(--yh-border)", color: "var(--yh-text-secondary)" }}
+          className="flex flex-col items-start justify-between gap-4 pt-6 text-xs sm:flex-row sm:items-center"
+          style={{ color: "var(--yh-text-secondary)" }}
         >
           <span>© {new Date().getFullYear()} yayhop. All rights reserved.</span>
           <span className="inline-flex items-center gap-2">

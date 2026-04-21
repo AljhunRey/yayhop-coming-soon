@@ -236,14 +236,13 @@
 .yh-input {
     background: var(--yh-card);
     color: var(--yh-text);
-    border: 1px solid var(--yh-border);
-    transition: border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
+    border: none;
+    transition: box-shadow 180ms ease, transform 180ms ease;
 }
 .yh-input::placeholder { color: var(--yh-text-secondary); opacity: 0.7; }
 .yh-input:focus {
     outline: none;
-    border-color: var(--yh-accent);
-    box-shadow: 0 0 0 4px rgba(255, 118, 14, 0.18);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--yh-accent) 35%, transparent);
 }
 
 /* Primary button */
@@ -274,7 +273,6 @@
     text-transform: uppercase;
     background: color-mix(in srgb, var(--yh-accent) 12%, transparent);
     color: var(--yh-accent);
-    border: 1px solid color-mix(in srgb, var(--yh-accent) 35%, transparent);
 }
 
 .yh-dot {
@@ -289,20 +287,10 @@
 /* Hide Emergent branding badge (per user request) */
 #emergent-badge { display: none !important; }
 
-/* Gear/wrench animation for "Under Development" pill */
+/* Gear animation for "Under Development" pill */
 @keyframes spinCW {
     from { transform: rotate(0deg); }
     to { transform: rotate(360deg); }
-}
-@keyframes spinCCW {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(-360deg); }
-}
-@keyframes wrenchTap {
-    0%, 60%, 100% { transform: rotate(0deg); }
-    70% { transform: rotate(-18deg); }
-    80% { transform: rotate(10deg); }
-    90% { transform: rotate(-4deg); }
 }
 
 .yh-gears {
@@ -310,24 +298,14 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 22px;
-    height: 22px;
+    width: 18px;
+    height: 18px;
     color: var(--yh-accent);
 }
 .yh-gear-lg {
-    width: 18px;
-    height: 18px;
+    width: 16px;
+    height: 16px;
     animation: spinCW 4s linear infinite;
     transform-origin: 50% 50%;
-}
-.yh-gear-sm {
-    position: absolute;
-    right: -6px;
-    bottom: -4px;
-    width: 11px;
-    height: 11px;
-    color: var(--yh-accent-dark);
-    animation: wrenchTap 2.2s ease-in-out infinite;
-    transform-origin: 70% 70%;
-    filter: drop-shadow(0 0 4px color-mix(in srgb, var(--yh-accent) 40%, transparent));
+    filter: drop-shadow(0 0 4px color-mix(in srgb, var(--yh-accent) 45%, transparent));
 }
