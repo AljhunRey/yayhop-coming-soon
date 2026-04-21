@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "sonner";
-import { ArrowRight, Mail, MapPin, Sparkles, Car, Package, Users, Check } from "lucide-react";
+import { ArrowRight, Mail, MapPin, Sparkles, Car, Package, Users, Check, Cog, Wrench } from "lucide-react";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
@@ -151,7 +151,10 @@ export default function Landing() {
             className="yh-pill animate-fade-up"
             data-testid="under-dev-badge"
           >
-            <span className="yh-dot" />
+            <span className="yh-gears" aria-hidden>
+              <Cog className="yh-gear-lg" />
+              <Wrench className="yh-gear-sm" />
+            </span>
             Under Development
           </span>
 

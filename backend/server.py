@@ -3,9 +3,10 @@ from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
 import os
+import re
 import logging
 from pathlib import Path
-from pydantic import BaseModel, EmailStr, Field, ConfigDict
+from pydantic import BaseModel, Field, ConfigDict, field_validator
 from typing import List, Optional
 import uuid
 from datetime import datetime, timezone
@@ -27,15 +28,26 @@ api_router = APIRouter(prefix="/api")
 
 
 # ---------- Models ----------
+EMAIL_RE = re.compile(r"^[^\s@]+@[^\s@]+\.[^\s@]+$")
+
+
 class WaitlistCreate(BaseModel):
-    email: EmailStr
+    email: str
     name: Optional[str] = None
+
+    @field_validator("email")
+    @classmethod
+    def _validate_email(cls, v: str) -> str:
+        v = (v or "").strip().lower()
+        if not EMAIL_RE.match(v):
+            raise ValueError("Invalid email address")
+        return v
 
 
 class WaitlistEntry(BaseModel):
     model_config = ConfigDict(extra="ignore")
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    email: EmailStr
+    email: str
     name: Optional[str] = None
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
