@@ -1,10 +1,7 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
 import { toast } from "sonner";
 import { ArrowRight, Mail, MapPin, Sparkles, Car, Package, Users, Check, Cog } from "lucide-react";
-
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-const API = `${BACKEND_URL}/api`;
+import { supabase } from "@/lib/supabase";
 
 const LOGO_DARK = "https://customer-assets.emergentagent.com/job_yayhop-coming-soon/artifacts/r6gf9rwx_yayhop-text-logo-dark.png";
 const LOGO_LIGHT = "https://customer-assets.emergentagent.com/job_d06f4357-d611-4fca-9e5e-ffbd70d85b75/artifacts/hhxmbv4i_yayhop-text-logo-light.png";
@@ -39,12 +36,11 @@ export default function Landing() {
 
   useEffect(() => {
     let mounted = true;
-    axios
-      .get(`${API}/waitlist/count`)
-      .then((r) => {
-        if (mounted) setCount(r.data.count ?? 0);
-      })
-      .catch(() => {});
+    supabase
+      .rpc("get_waitlist_count")
+      .then(({ data, error }) => {
+        if (mounted && !error && typeof data === "number") setCount(data);
+      });
     return () => {
       mounted = false;
     };
@@ -52,7 +48,7 @@ export default function Landing() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const trimmed = email.trim();
+    const trimmed = email.trim().toLowerCase();
     if (!trimmed) {
       toast.error("Please enter your email");
       return;
@@ -64,22 +60,27 @@ export default function Landing() {
     }
     setLoading(true);
     try {
-      const { data } = await axios.post(`${API}/waitlist`, {
-        email: trimmed,
-        name: name.trim() || null,
-      });
-      setJoined(true);
-      if (data.already_joined) {
-        toast.success("You're already on the list — hop tight!");
+      const { error } = await supabase
+        .from("waitlist")
+        .insert({ email: trimmed, name: name.trim() || null });
+
+      if (error) {
+        // Postgres unique-violation code = 23505
+        if (error.code === "23505") {
+          setJoined(true);
+          toast.success("You're already on the list — hop tight!");
+        } else {
+          console.error("waitlist insert error:", error);
+          toast.error("Something hopped wrong. Try again?");
+        }
       } else {
+        setJoined(true);
         toast.success("You're in! We'll hop into your inbox soon.");
         setCount((c) => (typeof c === "number" ? c + 1 : c));
       }
     } catch (err) {
-      const detail = err?.response?.data?.detail;
-      toast.error(
-        typeof detail === "string" ? detail : "Something hopped wrong. Try again?"
-      );
+      console.error(err);
+      toast.error("Something hopped wrong. Try again?");
     } finally {
       setLoading(false);
     }

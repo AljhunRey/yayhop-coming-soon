@@ -1,10 +1,8 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
-import { Lock, RefreshCw, Download, Mail, Users } from "lucide-react";
+import { Lock, RefreshCw, Download, Mail, Users, ExternalLink } from "lucide-react";
+import { createAdminClient, supabase, SUPABASE_PROJECT_URL } from "@/lib/supabase";
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-const API = `${BACKEND_URL}/api`;
-const STORAGE_KEY = "yh_admin_key";
+const STORAGE_KEY = "yh_supabase_service_key";
 
 export default function Admin() {
   const [key, setKey] = useState(() => localStorage.getItem(STORAGE_KEY) || "");
@@ -13,26 +11,48 @@ export default function Admin() {
   const [error, setError] = useState("");
   const [count, setCount] = useState(null);
 
+  // Public count via RPC (doesn't leak rows)
   useEffect(() => {
-    axios.get(`${API}/waitlist/count`).then((r) => setCount(r.data.count)).catch(() => {});
+    supabase
+      .rpc("get_waitlist_count")
+      .then(({ data, error: e }) => {
+        if (!e && typeof data === "number") setCount(data);
+      });
   }, []);
 
   const load = async (k) => {
     const useKey = (k ?? key).trim();
     if (!useKey) {
-      setError("Please enter your admin key");
+      setError("Please paste your Supabase service_role key");
+      return;
+    }
+    if (!useKey.startsWith("eyJ")) {
+      setError("That doesn't look like a Supabase JWT — it should start with 'eyJ'.");
       return;
     }
     setLoading(true);
     setError("");
     try {
-      const { data } = await axios.get(`${API}/waitlist/admin`, { params: { key: useKey } });
-      setEntries(data);
-      localStorage.setItem(STORAGE_KEY, useKey);
+      const admin = createAdminClient(useKey);
+      const { data, error: e } = await admin
+        .from("waitlist")
+        .select("id, email, name, created_at")
+        .order("created_at", { ascending: false });
+      if (e) {
+        console.error(e);
+        if (e.message?.toLowerCase().includes("jwt")) {
+          setError("Invalid service_role key.");
+        } else {
+          setError(e.message || "Couldn't load entries.");
+        }
+        setEntries(null);
+      } else {
+        setEntries(data || []);
+        localStorage.setItem(STORAGE_KEY, useKey);
+      }
     } catch (err) {
-      const status = err?.response?.status;
-      if (status === 403) setError("Invalid admin key.");
-      else setError("Couldn't load entries. Try again?");
+      console.error(err);
+      setError("Couldn't connect to Supabase.");
       setEntries(null);
     } finally {
       setLoading(false);
@@ -83,6 +103,12 @@ export default function Admin() {
     }
   };
 
+  const supabaseTableUrl = SUPABASE_PROJECT_URL
+    ? `https://supabase.com/dashboard/project/${
+        SUPABASE_PROJECT_URL.replace("https://", "").split(".")[0]
+      }/editor`
+    : null;
+
   return (
     <main className="yh-bg min-h-screen" data-testid="admin-page">
       <div className="mx-auto max-w-5xl px-5 py-10 sm:px-8 sm:py-14">
@@ -95,7 +121,10 @@ export default function Admin() {
               Waitlist entries
             </h1>
             <p className="mt-1 text-sm" style={{ color: "var(--yh-text-secondary)" }}>
-              Total signups: <strong style={{ color: "var(--yh-text)" }}>{count ?? "—"}</strong>
+              Total signups:{" "}
+              <strong style={{ color: "var(--yh-text)" }}>{count ?? "—"}</strong>
+              <span className="mx-2 opacity-50">·</span>
+              Data source: Supabase
             </p>
           </div>
           {entries && (
@@ -106,17 +135,31 @@ export default function Admin() {
                 style={{ background: "var(--yh-card)", color: "var(--yh-text)" }}
                 data-testid="admin-refresh"
               >
-                <RefreshCw className="h-4 w-4" />
+                <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
                 Refresh
               </button>
               <button
                 onClick={downloadCsv}
+                disabled={!entries.length}
                 className="yh-btn inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-bold"
                 data-testid="admin-download-csv"
               >
                 <Download className="h-4 w-4" />
                 Export CSV
               </button>
+              {supabaseTableUrl && (
+                <a
+                  href={supabaseTableUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold"
+                  style={{ background: "var(--yh-card)", color: "var(--yh-text)" }}
+                  data-testid="admin-open-supabase"
+                >
+                  <ExternalLink className="h-4 w-4" />
+                  Open in Supabase
+                </a>
+              )}
               <button
                 onClick={logout}
                 className="inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold"
@@ -142,19 +185,21 @@ export default function Admin() {
           >
             <div className="mb-3 flex items-center gap-2 text-sm font-semibold" style={{ color: "var(--yh-text)" }}>
               <Lock className="h-4 w-4" style={{ color: "var(--yh-accent)" }} />
-              Admin key required
+              Supabase service_role key required
             </div>
             <p className="mb-5 text-sm" style={{ color: "var(--yh-text-secondary)" }}>
-              Enter your admin key to view all waitlist signups. The key is stored locally in this browser so you won't have to re-enter it.
+              Paste your Supabase <strong style={{ color: "var(--yh-text)" }}>service_role</strong> key (Settings → API Keys). It is stored only in your browser's localStorage on this device — never in the source code, never sent to anyone but Supabase.
             </p>
             <div className="flex flex-col gap-3 sm:flex-row">
               <input
                 type="password"
-                placeholder="Paste admin key"
+                placeholder="eyJhbGci..."
                 value={key}
                 onChange={(e) => setKey(e.target.value)}
-                className="yh-input h-12 flex-1 rounded-xl px-4 text-sm"
+                className="yh-input h-12 w-full rounded-xl px-4 text-sm sm:flex-1"
                 data-testid="admin-key-input"
+                autoComplete="off"
+                spellCheck={false}
               />
               <button
                 type="submit"
@@ -168,6 +213,20 @@ export default function Admin() {
             {error && (
               <p className="mt-3 text-sm font-medium" style={{ color: "#ff3b30" }} data-testid="admin-error">
                 {error}
+              </p>
+            )}
+            {supabaseTableUrl && (
+              <p className="mt-4 text-xs" style={{ color: "var(--yh-text-secondary)" }}>
+                Prefer the Supabase dashboard?{" "}
+                <a
+                  href={supabaseTableUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="font-semibold underline"
+                  style={{ color: "var(--yh-accent)" }}
+                >
+                  Open waitlist table →
+                </a>
               </p>
             )}
           </form>
@@ -210,7 +269,9 @@ export default function Admin() {
                         <td className="px-5 py-4 font-semibold" style={{ color: "var(--yh-text-secondary)" }}>
                           {entries.length - i}
                         </td>
-                        <td className="px-5 py-4">{e.name || <span style={{ color: "var(--yh-text-secondary)" }}>—</span>}</td>
+                        <td className="px-5 py-4">
+                          {e.name || <span style={{ color: "var(--yh-text-secondary)" }}>—</span>}
+                        </td>
                         <td className="px-5 py-4">
                           <a
                             href={`mailto:${e.email}`}
