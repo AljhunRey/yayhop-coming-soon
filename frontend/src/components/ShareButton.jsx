@@ -4,13 +4,13 @@ import {
   Share2,
   Link2,
   Check,
-  Twitter,
   Facebook,
   Linkedin,
   MessageCircle,
   Send,
   Instagram,
 } from "lucide-react";
+import { XLogo } from "@/components/BrandIcons";
 import { trackEvent } from "@/lib/analytics";
 
 // Always share the canonical production URL, regardless of where the user
@@ -94,8 +94,8 @@ export default function ShareButton() {
   const linkTargets = [
     {
       id: "x",
-      label: "X / Twitter",
-      Icon: Twitter,
+      label: "X",
+      Icon: XLogo,
       href: `https://twitter.com/intent/tweet?text=${enc(SHARE_TEXT)}&url=${enc(shareUrl)}`,
     },
     {
