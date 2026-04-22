@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { ArrowRight, Mail, MapPin, Sparkles, Car, Package, Users, Check, Cog } from "lucide-react";
 import { supabase } from "@/lib/supabase";
+import ShareButton from "@/components/ShareButton";
 
 const LOGO_DARK = "https://customer-assets.emergentagent.com/job_yayhop-coming-soon/artifacts/r6gf9rwx_yayhop-text-logo-dark.png";
 const LOGO_LIGHT = "https://customer-assets.emergentagent.com/job_d06f4357-d611-4fca-9e5e-ffbd70d85b75/artifacts/hhxmbv4i_yayhop-text-logo-light.png";
@@ -126,18 +127,21 @@ export default function Landing() {
             data-testid="logo-light"
           />
         </a>
-        <a
-          href={`mailto:${CONTACT_EMAIL}`}
-          className="hidden items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition hover:scale-[1.02] sm:inline-flex"
-          style={{
-            color: "var(--yh-text)",
-            backgroundColor: "var(--yh-card)",
-          }}
-          data-testid="header-contact-link"
-        >
-          <Mail className="h-4 w-4" style={{ color: "var(--yh-accent)" }} />
-          <span>{CONTACT_EMAIL}</span>
-        </a>
+        <div className="flex items-center gap-2 sm:gap-3">
+          <ShareButton />
+          <a
+            href={`mailto:${CONTACT_EMAIL}`}
+            className="hidden items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition hover:scale-[1.02] sm:inline-flex"
+            style={{
+              color: "var(--yh-text)",
+              backgroundColor: "var(--yh-card)",
+            }}
+            data-testid="header-contact-link"
+          >
+            <Mail className="h-4 w-4" style={{ color: "var(--yh-accent)" }} />
+            <span>{CONTACT_EMAIL}</span>
+          </a>
+        </div>
       </header>
 
       {/* Hero */}
