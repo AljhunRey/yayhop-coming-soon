@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { ArrowRight, Mail, MapPin, Sparkles, Car, Package, Users, Check, Cog } from "lucide-react";
+import { ArrowRight, Mail, MapPin, Sparkles, Car, ShoppingBag, UsersRound, Check, Cog } from "lucide-react";
 import { supabase } from "@/lib/supabase";
+import { trackEvent, trackPageViewOnce } from "@/lib/analytics";
 import ShareButton from "@/components/ShareButton";
 
 const LOGO_DARK = "https://customer-assets.emergentagent.com/job_yayhop-coming-soon/artifacts/r6gf9rwx_yayhop-text-logo-dark.png";
@@ -17,12 +18,12 @@ const FEATURES = [
     copy: "Plan trips ahead, split costs, and meet riders going your way.",
   },
   {
-    icon: Users,
+    icon: UsersRound,
     title: "Share Travels",
     copy: "Post your route, find companions, and turn journeys into stories.",
   },
   {
-    icon: Package,
+    icon: ShoppingBag,
     title: "Help with Pasabuys",
     copy: "Bring home what matters — pick up, deliver, earn on the way.",
   },
@@ -36,6 +37,7 @@ export default function Landing() {
   const [count, setCount] = useState(null);
 
   useEffect(() => {
+    trackPageViewOnce();
     let mounted = true;
     supabase
       .rpc("get_waitlist_count")
@@ -77,6 +79,7 @@ export default function Landing() {
       } else {
         setJoined(true);
         toast.success("You're in! We'll hop into your inbox soon.");
+        trackEvent("waitlist_signup");
         setCount((c) => (typeof c === "number" ? c + 1 : c));
       }
     } catch (err) {
@@ -110,7 +113,7 @@ export default function Landing() {
 
       {/* Nav */}
       <header
-        className="relative z-10 mx-auto flex max-w-7xl items-center justify-between px-5 py-5 sm:px-8 sm:py-7"
+        className="relative z-50 mx-auto flex max-w-7xl items-center justify-between px-5 py-5 sm:px-8 sm:py-7"
         data-testid="site-header"
       >
         <a href="/" className="flex items-center gap-3" data-testid="logo-link">
