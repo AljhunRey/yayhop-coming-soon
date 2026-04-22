@@ -1,10 +1,9 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
 import { toast } from "sonner";
-import { ArrowRight, Mail, MapPin, Sparkles, Car, Package, Users, Check, Cog } from "lucide-react";
-
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-const API = `${BACKEND_URL}/api`;
+import { ArrowRight, Mail, MapPin, Sparkles, Car, ShoppingBag, UsersRound, Check, Cog } from "lucide-react";
+import { supabase } from "@/lib/supabase";
+import { trackEvent, trackPageViewOnce } from "@/lib/analytics";
+import ShareButton from "@/components/ShareButton";
 
 const LOGO_DARK = "https://customer-assets.emergentagent.com/job_yayhop-coming-soon/artifacts/r6gf9rwx_yayhop-text-logo-dark.png";
 const LOGO_LIGHT = "https://customer-assets.emergentagent.com/job_d06f4357-d611-4fca-9e5e-ffbd70d85b75/artifacts/hhxmbv4i_yayhop-text-logo-light.png";
@@ -19,12 +18,12 @@ const FEATURES = [
     copy: "Plan trips ahead, split costs, and meet riders going your way.",
   },
   {
-    icon: Users,
+    icon: UsersRound,
     title: "Share Travels",
     copy: "Post your route, find companions, and turn journeys into stories.",
   },
   {
-    icon: Package,
+    icon: ShoppingBag,
     title: "Help with Pasabuys",
     copy: "Bring home what matters — pick up, deliver, earn on the way.",
   },
@@ -38,13 +37,13 @@ export default function Landing() {
   const [count, setCount] = useState(null);
 
   useEffect(() => {
+    trackPageViewOnce();
     let mounted = true;
-    axios
-      .get(`${API}/waitlist/count`)
-      .then((r) => {
-        if (mounted) setCount(r.data.count ?? 0);
-      })
-      .catch(() => {});
+    supabase
+      .rpc("get_waitlist_count")
+      .then(({ data, error }) => {
+        if (mounted && !error && typeof data === "number") setCount(data);
+      });
     return () => {
       mounted = false;
     };
@@ -52,7 +51,7 @@ export default function Landing() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const trimmed = email.trim();
+    const trimmed = email.trim().toLowerCase();
     if (!trimmed) {
       toast.error("Please enter your email");
       return;
@@ -64,22 +63,28 @@ export default function Landing() {
     }
     setLoading(true);
     try {
-      const { data } = await axios.post(`${API}/waitlist`, {
-        email: trimmed,
-        name: name.trim() || null,
-      });
-      setJoined(true);
-      if (data.already_joined) {
-        toast.success("You're already on the list — hop tight!");
+      const { error } = await supabase
+        .from("waitlist")
+        .insert({ email: trimmed, name: name.trim() || null });
+
+      if (error) {
+        // Postgres unique-violation code = 23505
+        if (error.code === "23505") {
+          setJoined(true);
+          toast.success("You're already on the list — hop tight!");
+        } else {
+          console.error("waitlist insert error:", error);
+          toast.error("Something hopped wrong. Try again?");
+        }
       } else {
+        setJoined(true);
         toast.success("You're in! We'll hop into your inbox soon.");
+        trackEvent("waitlist_signup");
         setCount((c) => (typeof c === "number" ? c + 1 : c));
       }
     } catch (err) {
-      const detail = err?.response?.data?.detail;
-      toast.error(
-        typeof detail === "string" ? detail : "Something hopped wrong. Try again?"
-      );
+      console.error(err);
+      toast.error("Something hopped wrong. Try again?");
     } finally {
       setLoading(false);
     }
@@ -108,7 +113,7 @@ export default function Landing() {
 
       {/* Nav */}
       <header
-        className="relative z-10 mx-auto flex max-w-7xl items-center justify-between px-5 py-5 sm:px-8 sm:py-7"
+        className="relative z-50 mx-auto flex max-w-7xl items-center justify-between px-5 py-5 sm:px-8 sm:py-7"
         data-testid="site-header"
       >
         <a href="/" className="flex items-center gap-3" data-testid="logo-link">
@@ -125,18 +130,21 @@ export default function Landing() {
             data-testid="logo-light"
           />
         </a>
-        <a
-          href={`mailto:${CONTACT_EMAIL}`}
-          className="hidden items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition hover:scale-[1.02] sm:inline-flex"
-          style={{
-            color: "var(--yh-text)",
-            backgroundColor: "var(--yh-card)",
-          }}
-          data-testid="header-contact-link"
-        >
-          <Mail className="h-4 w-4" style={{ color: "var(--yh-accent)" }} />
-          <span>{CONTACT_EMAIL}</span>
-        </a>
+        <div className="flex items-center gap-2 sm:gap-3">
+          <ShareButton />
+          <a
+            href={`mailto:${CONTACT_EMAIL}`}
+            className="hidden items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition hover:scale-[1.02] sm:inline-flex"
+            style={{
+              color: "var(--yh-text)",
+              backgroundColor: "var(--yh-card)",
+            }}
+            data-testid="header-contact-link"
+          >
+            <Mail className="h-4 w-4" style={{ color: "var(--yh-accent)" }} />
+            <span>{CONTACT_EMAIL}</span>
+          </a>
+        </div>
       </header>
 
       {/* Hero */}
