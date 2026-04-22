@@ -203,7 +203,7 @@ export default function Landing() {
               <input
                 type="email"
                 required
-                placeholder="you@awesome.com"
+                placeholder="Type your email here"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 disabled={joined || loading}
