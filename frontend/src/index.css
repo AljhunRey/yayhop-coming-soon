@@ -237,6 +237,13 @@
     background: var(--yh-card);
     color: var(--yh-text);
     border: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    box-sizing: border-box;
+    line-height: 1;
+    font-family: inherit;
+    font-size: 14px;
     transition: box-shadow 180ms ease, transform 180ms ease;
 }
 .yh-input::placeholder { color: var(--yh-text-secondary); opacity: 0.7; }

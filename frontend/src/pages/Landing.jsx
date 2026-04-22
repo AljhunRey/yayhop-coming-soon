@@ -199,7 +199,7 @@ export default function Landing() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 disabled={joined || loading}
-                className="yh-input h-12 flex-1 rounded-xl px-4 text-sm"
+                className="yh-input h-12 w-full rounded-xl px-4 text-sm sm:flex-1"
                 data-testid="waitlist-email-input"
               />
             </div>
